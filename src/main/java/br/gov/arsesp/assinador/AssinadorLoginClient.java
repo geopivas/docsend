@@ -34,6 +34,12 @@ public class AssinadorLoginClient extends ClientServico {
 		Response resposta = enviarRquisicao(dadosLogin, targetLogin);
 		return resposta.getStatus();
 	}
+	
+	public Response getResponseLoginSemToken(Login dadosLogin) {
+		WebTarget targetLogin = getTarget().path(STR_URI_LOGIN_SEM_TOKEN);
+		Response resposta = enviarRquisicao(dadosLogin, targetLogin);
+		return resposta;
+	}
 
 	private Response enviarRquisicao(Login dadosLogin, WebTarget targetLogin) {
 		Invocation.Builder builder = getInvocationBuilder(targetLogin);

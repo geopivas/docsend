@@ -1,5 +1,7 @@
 package br.gov.arsesp.assinador;
 
+import javax.ws.rs.core.Response;
+
 import br.gov.arsesp.assinador.dominio.Login;
 import junit.framework.TestCase;
 
@@ -28,6 +30,13 @@ public class AssinadorLoginClientTest extends TestCase {
 		int retorno = new AssinadorLoginClient().getLoginSemToken(dadosLogin);
 		assertNotNull(retorno);
 		assertEquals(retorno, 200);
+	}
+	
+	public void testGetResponseLoginComSucessoSemToken() {
+		Login dadosLogin = new Login("esilva@sp.gov.br", "@r&3sp2018");
+		Response respostaDoLogin = new AssinadorLoginClient().getResponseLoginSemToken(dadosLogin);
+		assertNotNull(respostaDoLogin);
+		assertEquals(respostaDoLogin.getStatus(), 200);
 	}
 	
 }
