@@ -3,7 +3,10 @@ package br.gov.arsesp.assinador.dominio;
 import java.io.File;
 import java.io.InputStream;
 
+import javax.xml.bind.annotation.XmlRootElement;
 
+
+@XmlRootElement
 public class DocumentoCreateExternoRequest {
 
 	private String nome;
@@ -13,6 +16,7 @@ public class DocumentoCreateExternoRequest {
 	private File arquivoLocal;
 	private Byte[] bytes;
 	private File arquivo;
+	private String stringBase64;
 	
 	
 	public DocumentoCreateExternoRequest(String nome, String arquivoNome, int idTipoDocumento, InputStream conteudo, Byte[] bytes) {
@@ -73,6 +77,13 @@ public class DocumentoCreateExternoRequest {
 	public void setBytes(Byte[] bytes) {
 		this.bytes = bytes;
 	}
-	
+
+	public String getStringBase64() {
+		return stringBase64;
+	}
+
+	public void setStringBase64(String stringBase64) {
+		this.stringBase64 = stringBase64;
+	}	
 
 }
