@@ -43,10 +43,10 @@ public class AssinadorEnvioDocumentoClientTest extends TestCase{
 		DocumentoCreateExternoRequest docTeste = new DocumentoCreateExternoRequest();
 		docTeste.setArquivoNome("meuTesteRest.pdf");;
 		docTeste.setNome("DocumentoDeTesteRest.pdf");
-		//TODO Descobrir o tipo de documento pelo formato
 		docTeste.setTipoId(38);
 		docTeste.setConteudoInputStream(FileUtils.getInputStreamDoDocumento(TESTEDOC_PDF));
 		docTeste.setArquivoLocal(FileUtils.getArquivo(TESTEDOC_PDF));
+		docTeste.setStringBase64(FileUtils.getBase64DoArquivo(docTeste.getArquivoLocal()));
 		return docTeste;
 	}
 	
