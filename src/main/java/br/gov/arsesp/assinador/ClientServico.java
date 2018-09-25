@@ -1,5 +1,15 @@
 package br.gov.arsesp.assinador;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
@@ -16,7 +26,12 @@ public abstract class ClientServico {
 	}
 
 	private void iniciaTargetServico() {
-		client = ClientBuilder.newClient();
+		client = ClientBuilder.newBuilder().sslContext(getSSLContext()).hostnameVerifier(new HostnameVerifier() {
+			
+			public boolean verify(String arg0, SSLSession arg1) {
+				return true;
+			}
+		}).build();
 		setTarget(client.target(STR_URL));
 	}
 
@@ -50,6 +65,34 @@ public abstract class ClientServico {
 	
 	protected WebTarget getTarget(Client client) {
 		return client.target(STR_URL);
+	}
+	
+	
+	public SSLContext getSSLContext() {
+
+	    SSLContext context= null;
+	    try {
+	        context = SSLContext.getInstance("SSL");
+	    } catch (NoSuchAlgorithmException e) {
+	        e.printStackTrace();
+	    }
+	    try {
+	        context.init(null,new TrustManager[]{new X509TrustManager(){
+	            public void checkClientTrusted(      X509Certificate[] x509Certificates,      String authType)  {
+	            }
+	            public void checkServerTrusted(      X509Certificate[] x509Certificates,      String authType) {
+
+	            }
+	            public X509Certificate[] getAcceptedIssuers(){
+	                return new X509Certificate[0];
+	            }
+	        }
+	        },new SecureRandom());
+	    } catch (KeyManagementException e) {
+	        e.printStackTrace();
+	    }
+
+	    return  context;
 	}
 	
 }

@@ -1,6 +1,5 @@
 package br.gov.arsesp.assinador;
 
-import javax.print.attribute.standard.Media;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -11,10 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.file.FileDataBodyPart;
 import com.sun.jersey.multipart.impl.MultiPartWriter;
 
 import br.gov.arsesp.assinador.dominio.DocumentoCreateExternoRequest;
@@ -24,22 +20,19 @@ public class AssinadorEnvioDocumentoClient extends ClientServico {
 	
 	public static final String STR_URI_CRIAR_DOCUMENTO_EXTERNO = "/Api/Documento/CreateExterno";
 	
-	public boolean enviarDocumento(DocumentoCreateExternoRequest documentoParaAssinar, Remetente documentoRemetente) {	
+	public boolean enviarDocumento(DocumentoCreateExternoRequest documentoParaAssinar, Remetente documentoRemetente) {
 		
-		Client build = getClientBuilder().register(MultiPartWriter.class).build();
+		Client build = getClient().register(MultiPartWriter.class);
 		WebTarget webTarget = getTarget(build).path(STR_URI_CRIAR_DOCUMENTO_EXTERNO);
 		Builder invocationBuilder = getInvocationBuilder(webTarget);
 		defineParametrosDeProxyBacen();
-				
-		FormDataMultiPart formMulti = getFormMultiComFields(documentoParaAssinar, documentoRemetente);		
 		
-		
-		FileDataBodyPart arquivo = new FileDataBodyPart("bytes", documentoParaAssinar.getArquivoLocal(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
-		formMulti.bodyPart(arquivo);
-		
+		FormDataMultiPart formMulti = getFormMultiComFields(documentoParaAssinar, documentoRemetente);
+		formMulti.getHeaders().add("mediaType", MediaType.APPLICATION_JSON);
 
 		Entity<FormDataMultiPart> entityDocumentoPost = Entity.entity(formMulti, formMulti.getMediaType());		
 		Response resposta = invocationBuilder.post(entityDocumentoPost);
+		System.out.println(resposta.readEntity(String.class));
 		return resposta.getStatus() == 200;
 	}
 
@@ -49,12 +42,13 @@ public class AssinadorEnvioDocumentoClient extends ClientServico {
 		formMulti.field("nome", documentoParaAssinar.getNome());
 		formMulti.field("arquivoNome", documentoParaAssinar.getArquivoNome());
 		formMulti.field("tipoId", String.valueOf(documentoParaAssinar.getTipoId()));
+		formMulti.field("bytes", documentoParaAssinar.getStringBase64());
 		
 		Gson jsonRemetente = new Gson();
 		String json = jsonRemetente.toJson(documentoRemetente);
 		
 		
-		formMulti.field("remetente", json, MediaType.APPLICATION_JSON_TYPE);
+		formMulti.field("Signatarios", json, MediaType.APPLICATION_JSON_TYPE);
 		
 		return formMulti;
 	}
