@@ -14,10 +14,10 @@ public class AssinadorEnvioDocumentoClientTest extends TestCase{
 		
 		Login dadosLogin = new Login("esilva@sp.gov.br", "@r&3sp2018");
 		AssinadorLoginClient assinadorLoginClient = new AssinadorLoginClient();
-		String loginToken = assinadorLoginClient.getLoginToken(dadosLogin);
-		assertNotNull(loginToken);
+//		String loginToken = assinadorLoginClient.getLoginToken(dadosLogin);
+//		assertNotNull(loginToken);
 		
-		Remetente remetente = getRemetente(loginToken, dadosLogin);
+		Remetente remetente = getRemetente("", dadosLogin);
 		
 		
 		AssinadorEnvioDocumentoClient envioDeDocumento = new AssinadorEnvioDocumentoClient();
