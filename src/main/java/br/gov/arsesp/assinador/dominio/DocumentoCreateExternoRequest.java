@@ -1,7 +1,6 @@
 package br.gov.arsesp.assinador.dominio;
 
-import java.io.File;
-import java.io.InputStream;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -10,21 +9,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class DocumentoCreateExternoRequest {
 
 	private String nome;
-	private String arquivonome;
-	private int tipoid;
-	private InputStream conteudoInputStream;
-	private File arquivoLocal;
-	private Byte[] bytes;
-	private File arquivo;
-	private String stringBase64;
+	private String arquivoNome;
+	private String tipoId;
+	private String bytes;
+	private List<UsuarioEtapaModel> signatarios;
+	private RemetenteModel remetente;
 	
-	
-	public DocumentoCreateExternoRequest(String nome, String arquivoNome, int idTipoDocumento, InputStream conteudo, Byte[] bytes) {
+	public DocumentoCreateExternoRequest(String nome, String arquivoNome, String idTipoDocumento, List<UsuarioEtapaModel> signatarios, RemetenteModel remetente) {
 		this.nome = nome;
-		this.arquivonome = arquivoNome;
-		this.tipoid = idTipoDocumento;
-		this.conteudoInputStream = conteudo;
-		this.bytes = bytes;
+		this.arquivoNome = arquivoNome;
+		this.tipoId = idTipoDocumento;
+		this.signatarios = signatarios;
+		this.remetente = remetente;
 	}
 
 	public DocumentoCreateExternoRequest() {
@@ -39,51 +35,43 @@ public class DocumentoCreateExternoRequest {
 	}
 
 	public String getArquivoNome() {
-		return arquivonome;
+		return arquivoNome;
 	}
 
 	public void setArquivoNome(String arquivoNome) {
-		this.arquivonome = arquivoNome;
+		this.arquivoNome = arquivoNome;
 	}
 
-	public InputStream getConteudoInputStream() {
-		return conteudoInputStream;
+	public String getTipoId() {
+		return tipoId;
 	}
 
-	public void setConteudoInputStream(InputStream conteudoInputStream) {
-		this.conteudoInputStream = conteudoInputStream;
-	}
-
-	public int getTipoId() {
-		return tipoid;
-	}
-
-	public void setTipoId(int tipoId) {
-		this.tipoid = tipoId;
-	}
-
-	public File getArquivoLocal() {
-		return arquivoLocal;
-	}
-
-	public void setArquivoLocal(File arquivoLocal) {
-		this.arquivoLocal = arquivoLocal;
-	}
-
-	public Byte[] getBytes() {
-		return bytes;
-	}
-
-	public void setBytes(Byte[] bytes) {
-		this.bytes = bytes;
+	public void setTipoId(String tipoId) {
+		this.tipoId = tipoId;
 	}
 
 	public String getStringBase64() {
-		return stringBase64;
+		return bytes;
 	}
 
 	public void setStringBase64(String stringBase64) {
-		this.stringBase64 = stringBase64;
+		this.bytes = stringBase64;
+	}
+
+	public List<UsuarioEtapaModel> getSignatarios() {
+		return signatarios;
+	}
+
+	public void setSignatarios(List<UsuarioEtapaModel> signatarios) {
+		this.signatarios = signatarios;
+	}
+
+	public RemetenteModel getRemetente() {
+		return remetente;
+	}
+
+	public void setRemetente(RemetenteModel remetente) {
+		this.remetente = remetente;
 	}	
 
 }
