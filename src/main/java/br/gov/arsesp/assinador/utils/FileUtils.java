@@ -52,6 +52,11 @@ public class FileUtils {
 		byte[] encode = Base64.encode(arrayDeBytesDoFile);
 		return new String(encode);
 	}
+
+	public static String getBase64DoArquivo(String testedocPdf) throws FileNotFoundException, IOException {
+		File arquivo = getArquivo(testedocPdf);
+		return getBase64DoArquivo(arquivo);
+	}
 	
 	
 
