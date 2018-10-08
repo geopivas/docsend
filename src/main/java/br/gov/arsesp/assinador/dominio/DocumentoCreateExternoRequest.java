@@ -50,11 +50,11 @@ public class DocumentoCreateExternoRequest {
 		this.tipoId = tipoId;
 	}
 
-	public String getStringBase64() {
+	public String getBytes() {
 		return bytes;
 	}
 
-	public void setStringBase64(String stringBase64) {
+	public void setBytes(String stringBase64) {
 		this.bytes = stringBase64;
 	}
 
