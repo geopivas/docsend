@@ -12,22 +12,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.sun.jersey.core.util.Base64;
-import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.impl.MultiPartWriter;
 
+import br.gov.arsesp.assinador.dominio.DestinatarioModel;
 import br.gov.arsesp.assinador.dominio.DocumentoCreateExternoRequest;
 import br.gov.arsesp.assinador.dominio.Login;
-import br.gov.arsesp.assinador.dominio.Remetente;
+import br.gov.arsesp.assinador.dominio.UsuarioEtapaModel;
+
 
 public class AssinadorEnvioDocumentoClient extends ClientServico {
 	
 	public static final String STR_URI_CRIAR_DOCUMENTO_EXTERNO = "/Api/Documento/CreateExterno";
 	
-	public boolean enviarDocumento(DocumentoCreateExternoRequest documentoParaAssinar, Remetente documentoRemetente) {
+	public boolean enviarDocumento(DocumentoCreateExternoRequest documentoParaAssinar, UsuarioEtapaModel documentoRemetente) {
 		
-		Client build = getClient().register(MultiPartWriter.class);
+		Client build = getClient();
 		WebTarget webTarget = getTarget(build).path(STR_URI_CRIAR_DOCUMENTO_EXTERNO);
 		Builder invocationBuilder = getInvocationBuilder(webTarget);
 		defineParametrosDeProxyBacen();
@@ -43,9 +41,8 @@ public class AssinadorEnvioDocumentoClient extends ClientServico {
 		ACS-Authorization-User-UID: a1be417e-0c70-42a1-8405-d96fb964d87b */
 		invocationBuilder.header("ACS-Authorization-Token", tokenLogin);
 		
-		/*JsonObject json = new JsonObject();
-		json.addProperty("bytes", documentoParaAssinar.getStringBase64());*/
-//		json.add(property, value);
+//		JsonObject json = new JsonObject();
+//		json.addProperty("bytes", documentoParaAssinar.getStringBase64());
 		
 //		FormDataMultiPart formMulti = getFormMultiComFields(documentoParaAssinar, documentoRemetente);
 //		formMulti.bodyPart(json, MediaType.APPLICATION_JSON_TYPE);
@@ -53,13 +50,25 @@ public class AssinadorEnvioDocumentoClient extends ClientServico {
 		
 		Form formularioRequisicao = getFormSimplesComFields(documentoParaAssinar, documentoRemetente);
 		Entity<Form> entityDocumentoPost = Entity.entity(formularioRequisicao, MediaType.APPLICATION_JSON_TYPE);
-			
-		Response resposta = invocationBuilder.post(entityDocumentoPost);
-		System.out.println(resposta.readEntity(String.class));
+		
+		Gson jsonEntity = new Gson();
+		StringBuilder json2 = new StringBuilder(jsonEntity.toJson(entityDocumentoPost.getEntity()));
+		System.out.println("Req json:" + json2);
+		json2.replace(0, "{\"parameters\":".length(), "");
+		String enviar = json2.toString();
+		System.out.println(enviar);
+		
+		Entity<String> jsonFromatado = Entity.entity(enviar, MediaType.APPLICATION_JSON);
+		Response resposta = invocationBuilder.post(jsonFromatado);
+		
+		
+		Gson respostaJson = new Gson();
+		String jsonResposta = respostaJson.toJson(resposta.readEntity(String.class));
+		System.out.println("Resposta velha: " +jsonResposta);
 		return resposta.getStatus() == 200;
 	}
 
-	private FormDataMultiPart getFormMultiComFields(DocumentoCreateExternoRequest documentoParaAssinar, Remetente documentoRemetente) {
+	/*private FormDataMultiPart getFormMultiComFields(DocumentoCreateExternoRequest documentoParaAssinar, UsuarioEtapaModel documentoRemetente) {
 		FormDataMultiPart formMulti = new FormDataMultiPart();
 		
 		formMulti.field("nome", documentoParaAssinar.getNome());
@@ -76,20 +85,25 @@ public class AssinadorEnvioDocumentoClient extends ClientServico {
 		formMulti.field("Signatarios", json, MediaType.APPLICATION_JSON_TYPE);
 		
 		return formMulti;
-	}
+	}*/
 	
-	private Form getFormSimplesComFields(DocumentoCreateExternoRequest documentoParaAssinar, Remetente documentoRemetente) {
+	private Form getFormSimplesComFields(DocumentoCreateExternoRequest documentoParaAssinar, UsuarioEtapaModel documentoRemetente) {
 		Form formSimples = new Form();
 		
 		formSimples.param("nome", documentoParaAssinar.getNome());
 		formSimples.param("arquivoNome", documentoParaAssinar.getArquivoNome());
 		formSimples.param("tipoId", String.valueOf(documentoParaAssinar.getTipoId()));
-		formSimples.param("bytes", documentoParaAssinar.getStringBase64());
+		formSimples.param("bytes", documentoParaAssinar.getBytes());
 		
 		Gson jsonRemetente = new Gson();
-		String json = jsonRemetente.toJson(documentoRemetente);
-		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("Signatarios", json);
+		String json = jsonRemetente.toJson(documentoParaAssinar.getSignatarios());
+		
+		DestinatarioModel dest = new DestinatarioModel();
+		dest.setEmail(documentoRemetente.getEmail() == null ? documentoParaAssinar.getSignatarios() == null ? "" : documentoParaAssinar.getSignatarios().get(0).getEmail() : "");
+		Gson jsonDestinatario = new Gson();
+		String jsonDest = jsonDestinatario.toJson(dest);
+		formSimples.param("Destinatários", jsonDest);
+		
 		
 		
 		formSimples.param("Signatarios", json);
@@ -97,14 +111,41 @@ public class AssinadorEnvioDocumentoClient extends ClientServico {
 		return formSimples;
 	}
 	
-	
 
 	@Override
 	protected Builder getInvocationBuilder(WebTarget targetLogin) {
 		Invocation.Builder builder = targetLogin.request();
-		builder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);		
-		builder.accept(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML, MediaType.APPLICATION_XML);		
+		builder.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_TYPE);		
+		builder.accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML);		
 		return builder;
+	}
+
+	public boolean enviarJSonDoObjetoCreateExternoRequest(DocumentoCreateExternoRequest documentoParaEnvio) {
+		
+		Client build = getClient();
+		WebTarget webTarget = getTarget(build).path(STR_URI_CRIAR_DOCUMENTO_EXTERNO);
+		Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
+		defineParametrosDeProxyBacen();
+		
+
+		Login dadosLogin = new Login("esilva@sp.gov.br", "@r&3sp2018");
+		AssinadorLoginClient login = new AssinadorLoginClient();
+		String tokenLogin = login.getLoginToken(dadosLogin);
+		
+		invocationBuilder.header("ACS-Authorization-Token", tokenLogin);
+		
+		Gson jsonRequisicao = new Gson();
+		String enviarJSON = jsonRequisicao.toJson(documentoParaEnvio);
+		System.out.println(enviarJSON);
+		
+		Entity<DocumentoCreateExternoRequest> jsonEnvio = Entity.entity(documentoParaEnvio, MediaType.APPLICATION_JSON_TYPE);
+		Response resposta = invocationBuilder.post(jsonEnvio);
+		
+		Gson respostaJson = new Gson();
+		String jsonResposta = respostaJson.toJson(resposta.readEntity(String.class));
+		System.out.println("Resposta nova:" + jsonResposta);
+		return resposta.getStatus() == 200;
+
 	}
 	
 }

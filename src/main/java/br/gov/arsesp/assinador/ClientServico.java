@@ -15,6 +15,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 
+
+
 public abstract class ClientServico {
 	
 	public static final String STR_URL = "https://utilize.assinasp.imprensaoficial.com.br";
