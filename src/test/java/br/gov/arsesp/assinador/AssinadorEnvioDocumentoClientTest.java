@@ -47,7 +47,7 @@ public class AssinadorEnvioDocumentoClientTest extends TestCase{
 		docTeste.setArquivoNome(TESTEDOC_PDF);
 		docTeste.setNome(TESTEDOC_PDF);
 		docTeste.setTipoId("38");
-		docTeste.setStringBase64(FileUtils.getBase64DoArquivo(TESTEDOC_PDF));
+		docTeste.setBytes(FileUtils.getBase64DoArquivo(TESTEDOC_PDF));
 		return docTeste;
 	}
 	
